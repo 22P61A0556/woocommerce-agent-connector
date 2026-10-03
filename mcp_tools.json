@@ -1,0 +1,91 @@
+{
+	"schemaVersion": "2025-03-26",
+	"description": "Read-only WooCommerce connector tools. Each tool maps to the corresponding authenticated GET endpoint in the FastAPI service.",
+	"tools": [
+		{
+			"name": "get_all_orders",
+			"description": "List one page of WooCommerce orders. Continue with subsequent page values until pagination.total_pages is reached.",
+			"inputSchema": {
+				"type": "object",
+				"properties": {
+					"page": { "type": "integer", "minimum": 1, "default": 1 },
+					"per_page": { "type": "integer", "minimum": 1, "maximum": 100, "default": 100 },
+					"status": { "type": "string" },
+					"customer": { "type": "integer", "minimum": 1 },
+					"after": { "type": "string", "description": "ISO-8601 lower bound for order creation date" },
+					"before": { "type": "string", "description": "ISO-8601 upper bound for order creation date" },
+					"order": { "type": "string", "enum": ["asc", "desc"] },
+					"orderby": { "type": "string" }
+				},
+				"additionalProperties": false
+			},
+			"endpoint": { "method": "GET", "path": "/orders" }
+		},
+		{
+			"name": "get_order_by_id",
+			"description": "Retrieve one WooCommerce order by its numeric ID.",
+			"inputSchema": {
+				"type": "object",
+				"properties": { "order_id": { "type": "integer", "minimum": 1 } },
+				"required": ["order_id"],
+				"additionalProperties": false
+			},
+			"endpoint": { "method": "GET", "path": "/orders/{order_id}" }
+		},
+		{
+			"name": "search_orders",
+			"description": "Search WooCommerce orders using WooCommerce-supported search text, optionally filtered by status.",
+			"inputSchema": {
+				"type": "object",
+				"properties": {
+					"q": { "type": "string", "minLength": 1, "maxLength": 200 },
+					"page": { "type": "integer", "minimum": 1, "default": 1 },
+					"per_page": { "type": "integer", "minimum": 1, "maximum": 100, "default": 100 },
+					"status": { "type": "string" }
+				},
+				"required": ["q"],
+				"additionalProperties": false
+			},
+			"endpoint": { "method": "GET", "path": "/orders/search" }
+		},
+		{
+			"name": "get_all_products",
+			"description": "List one page of WooCommerce products. Continue with subsequent page values until pagination.total_pages is reached.",
+			"inputSchema": {
+				"type": "object",
+				"properties": {
+					"page": { "type": "integer", "minimum": 1, "default": 1 },
+					"per_page": { "type": "integer", "minimum": 1, "maximum": 100, "default": 100 },
+					"category": { "type": "integer", "minimum": 1 },
+					"tag": { "type": "integer", "minimum": 1 },
+					"stock_status": { "type": "string" },
+					"order": { "type": "string", "enum": ["asc", "desc"] },
+					"orderby": { "type": "string" }
+				},
+				"additionalProperties": false
+			},
+			"endpoint": { "method": "GET", "path": "/products" }
+		},
+		{
+			"name": "search_products",
+			"description": "Search WooCommerce products using WooCommerce-supported search text, including product name or SKU where supported by the store.",
+			"inputSchema": {
+				"type": "object",
+				"properties": {
+					"q": { "type": "string", "minLength": 1, "maxLength": 200 },
+					"page": { "type": "integer", "minimum": 1, "default": 1 },
+					"per_page": { "type": "integer", "minimum": 1, "maximum": 100, "default": 100 }
+				},
+				"required": ["q"],
+				"additionalProperties": false
+			},
+			"endpoint": { "method": "GET", "path": "/products/search" }
+		}
+	],
+	"authentication": {
+		"type": "httpHeader",
+		"name": "X-API-Key",
+		"valueFrom": "API_KEY environment variable"
+	},
+	"readOnly": true
+}
